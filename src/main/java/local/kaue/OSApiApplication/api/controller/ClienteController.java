@@ -4,18 +4,15 @@
  */
 package local.kaue.OSApiApplication.api.controller;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import local.kaue.OSApiApplication.domain.model.Cliente;
 import local.kaue.OSApiApplication.domain.repository.ClienteRepository;
+import local.kaue.OSApiApplication.domain.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import static org.springframework.http.ResponseEntity.noContent;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,6 +31,10 @@ public class ClienteController {
 
     @Autowired
     private ClienteRepository clienteRepository;
+    
+    @Autowired
+    private ClienteService clienteService;
+    
 
     @GetMapping("/clientes")
     public List<Cliente> listas() {
@@ -56,7 +57,7 @@ public class ClienteController {
    @ResponseStatus(HttpStatus.CREATED)
    public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
         
-    return clienteRepository.save(cliente);
+    return clienteService.salvar(cliente);
    }
    
    
@@ -69,8 +70,9 @@ public class ClienteController {
            return ResponseEntity.notFound().build();
             
        }
+       
         cliente.setId(clienteID);
-        cliente = clienteRepository.save(cliente);
+        cliente = clienteService.salvar(cliente);
         return ResponseEntity.ok(cliente);
         
    }
@@ -84,7 +86,7 @@ public class ClienteController {
            return ResponseEntity.notFound().build();
            
        }
-       clienteRepository.deleteById(clienteID);
+       clienteService.excluir(clienteID);
        return ResponseEntity.noContent().build();
    }
 }
