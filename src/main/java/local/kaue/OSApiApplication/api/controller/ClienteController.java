@@ -6,6 +6,7 @@ package local.kaue.OSApiApplication.api.controller;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,8 @@ import local.kaue.OSApiApplication.domain.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import static org.springframework.http.ResponseEntity.noContent;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,9 +52,9 @@ public class ClienteController {
         }
     }
     
-   @PostMapping("/cliente")
+   @PostMapping("/clientes")
    @ResponseStatus(HttpStatus.CREATED)
-   public Cliente adicionar(@RequestBody Cliente cliente) {
+   public Cliente adicionar(@Valid @RequestBody Cliente cliente) {
         
     return clienteRepository.save(cliente);
    }
@@ -59,7 +62,7 @@ public class ClienteController {
    
    
    @PutMapping("/clientes/{clienteID}")
-   public ResponseEntity<Cliente> atualizar (@PathVariable Long clienteID, @RequestBody Cliente cliente){
+   public ResponseEntity<Cliente> atualizar ( @Valid @PathVariable Long clienteID, @RequestBody Cliente cliente){
        
        //verifica se o cliente existe
        if (!clienteRepository.existsById(clienteID)){
@@ -70,5 +73,18 @@ public class ClienteController {
         cliente = clienteRepository.save(cliente);
         return ResponseEntity.ok(cliente);
         
+   }
+   
+   @DeleteMapping("/clientes/{clienteID}")
+   public ResponseEntity<Void> excluir(@PathVariable Long clienteID){
+       
+       //verfifica  se cliente existe ou não
+       
+       if(!clienteRepository.existsById(clienteID)){
+           return ResponseEntity.notFound().build();
+           
+       }
+       clienteRepository.deleteById(clienteID);
+       return ResponseEntity.noContent().build();
    }
 }
